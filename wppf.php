@@ -39,3 +39,9 @@ function wppf_textdomain(){
 	load_plugin_textdomain( 'wppf', false, basename( dirname( __FILE__ ) ) . '/languages/' );
 }
 add_action( 'plugins_loaded', 'wppf_textdomain' );
+
+/**
+ * Include files
+ */
+require plugin_dir_path( __FILE__ ) .'/autoloader.php';
+require plugin_dir_path( __FILE__ ) .'/inc/index.php';
