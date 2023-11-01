@@ -28,6 +28,25 @@ class Loripsum
 	 */
 	public function api( $request )
 	{
-		return file_get_contents( $this->url . $request );
+		$curl = curl_init();
+
+		curl_setopt_array( $curl, array(
+						CURLOPT_URL 			=> $this->url . $request,
+						CURLOPT_RETURNTRANSFER 	=> true,
+						CURLOPT_ENCODING 		=> 'gzip',
+						CURLOPT_MAXREDIRS 		=> 10,
+						CURLOPT_TIMEOUT 		=> 0,
+						CURLOPT_FOLLOWLOCATION 	=> true,
+						CURLOPT_HTTP_VERSION 	=> CURL_HTTP_VERSION_2_0,
+						CURLOPT_CUSTOMREQUEST 	=> 'GET',
+						CURLOPT_HTTPHEADER => array(
+										'Content-type: text/plain; charset=utf-8'
+						),
+		) );
+
+		$response = curl_exec( $curl );
+
+		curl_close( $curl );
+		return $response;
 	}
 }
