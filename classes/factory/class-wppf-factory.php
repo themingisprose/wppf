@@ -4,6 +4,7 @@ namespace WPPF\Factory;
 use WPPF\Factory\Posts;
 use WPPF\Setting_Fields\Dashboard_Setting_Fields as Dashboard;
 use WPPF\API\Loripsum;
+use WPPF\API\Lorem_Picsum;
 
 /**
  * The Factory
@@ -52,7 +53,7 @@ class Factory
 			if ( ! array_key_exists( $key, $_POST ) )
 				continue;
 
-			$api_fields = array(
+			$placeholders = array(
 				'api_paragraphs' 		=> ( isset( $_POST['api_paragraphs'] ) ) ? $_POST['api_paragraphs'] : null,
 				'api_paragraphs_length'	=> ( isset( $_POST['api_paragraphs_length'] ) ) ? $_POST['api_paragraphs_length'] : null,
 				'api_decorate' 			=> ( isset( $_POST['api_decorate'] ) ) ? 'decorate' : null,
@@ -67,17 +68,15 @@ class Factory
 
 			$amount		= $_POST[ $key .'_amount' ];
 			$post_type	= $value['type'];
-			$request	= join( '/', $api_fields );
-			$api 		= new Loripsum;
 
 			for ( $i = 0; $i < $amount; $i++ ) :
-				$result		= $api->api( $request );
-				preg_match( '`<h1>(.*?)</h1>`im', $result, $title );
+				$text = $this->text( $placeholders );
+				preg_match( '`<h1>(.*?)</h1>`im', $text, $title );
 				$lipsum_post = get_default_post_to_edit( $post_type, true );
 				$args = array(
 					'ID'			=> $lipsum_post->ID,
 					'post_title'	=> $title[1],
-					'post_content'	=> str_replace( $title[0], '', $result ),
+					'post_content'	=> str_replace( $title[0], '', $text ),
 					'post_status'	=> 'publish',
 					'post_type'		=> $post_type
 				);
@@ -85,5 +84,20 @@ class Factory
 				wp_update_post( $args );
 			endfor;
 		endforeach;
+	}
+
+	/**
+	 * Get the text
+	 * @param array $placeholders 	Array of placeholders
+	 * @link https://loripsum.net/
+	 *
+	 * @since 1.0.0
+	 */
+	private function text( $placeholders )
+	{
+			$request	= join( '/', $placeholders );
+			$text 		= new Loripsum;
+
+			return $text->api( $request );
 	}
 }
