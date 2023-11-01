@@ -3,8 +3,10 @@ namespace WPPF\Factory;
 
 use WPPF\Factory\Posts;
 use WPPF\Setting_Fields\Dashboard_Setting_Fields as Dashboard;
-use WPPF\API\Loripsum;
-use WPPF\API\Lorem_Picsum;
+use WPPF\API\{
+	Content,
+	Thumbnail
+};
 
 /**
  * The Factory
@@ -96,7 +98,7 @@ class Factory
 	private function text( $placeholders )
 	{
 			$request	= join( '/', $placeholders );
-			$text 		= new Loripsum;
+			$text 		= new Content;
 
 			return $text->api( $request );
 	}

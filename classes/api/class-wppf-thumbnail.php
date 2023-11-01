@@ -2,12 +2,12 @@
 namespace WPPF\API;
 
 /**
- * Loripsum API
- * @link https://loripsum.net/
+ * Lorem Picsum
+ * @link https://picsum.photos/
  *
  * @since 1.0.0
  */
-class Loripsum
+class Thumbnail
 {
 
 	/**
@@ -17,7 +17,7 @@ class Loripsum
 	 *
 	 * @since 1.0.0
 	 */
-	private $url = 'https://loripsum.net/api/';
+	private $url = 'https://picsum.photos/';
 
 	/**
 	 * API Request
@@ -31,7 +31,7 @@ class Loripsum
 		$curl = curl_init();
 
 		curl_setopt_array( $curl, array(
-						CURLOPT_URL 			=> $this->url . $request,
+						CURLOPT_URL 			=> $this->url( $request ),
 						CURLOPT_RETURNTRANSFER 	=> true,
 						CURLOPT_ENCODING 		=> 'gzip',
 						CURLOPT_MAXREDIRS 		=> 10,
@@ -39,9 +39,6 @@ class Loripsum
 						CURLOPT_FOLLOWLOCATION 	=> true,
 						CURLOPT_HTTP_VERSION 	=> CURL_HTTP_VERSION_2_0,
 						CURLOPT_CUSTOMREQUEST 	=> 'GET',
-						CURLOPT_HTTPHEADER => array(
-										'Content-type: text/plain; charset=utf-8'
-						),
 		) );
 
 		$response = curl_exec( $curl );
@@ -49,4 +46,15 @@ class Loripsum
 		curl_close( $curl );
 		return $response;
 	}
+
+	/**
+	 * Build the request URL
+	 *
+	 * @since 1.0.0
+	 */
+	public function url( $request )
+	{
+		return $this->url . $request;
+	}
+
 }
