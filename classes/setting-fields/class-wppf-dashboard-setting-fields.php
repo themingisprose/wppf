@@ -2,6 +2,7 @@
 namespace WPPF\Setting_Fields;
 
 use WPPF\Setting_Fields\Setting_Fields;
+use WPPF\Factory\Posts;
 
 /**
  * Dashboard Setting Fields
@@ -22,20 +23,12 @@ class Dashboard_Setting_Fields extends Setting_Fields
 		$this->field_id 		= 'wppf-setting-fields-field';
 		$this->field_title 		= __( 'Factory Setting', 'text-domain' );
 		$this->wpml_field		= 'my_class_of_fields_filters_fields';
+
+		$this->nonce 			= '_wppfnonce';
 	}
 
 	function fields()
 	{
-		$post_types_args = array(
-			'public'	=> true
-		);
-		$post_types = get_post_types( $post_types_args, 'objects' );
-		foreach ( $post_types as $post => $value ) :
-			// No attachment support
-			if ( 'attachment' == $post )
-				continue;
-			$all_post_types[ $post ] = $value->label;
-		endforeach;
 
 		$fields['title_01'] = array(
 			'label'	=> __( 'Post Type Setting', 'text-domain' ),
@@ -49,15 +42,16 @@ class Dashboard_Setting_Fields extends Setting_Fields
 			'type'	=> 'paragraph'
 		);
 
-		foreach ( $all_post_types as $post => $label ) :
-			$fields['post_type_'. $post] = array(
-				'label'	=> $label,
-				'meta'	=> 'post_type_'. $post,
+		$all_post_types = new Posts;
+		foreach ( $all_post_types->posts() as $post => $value ) :
+			$fields[$post] = array(
+				'label'	=> $value['label'],
+				'meta'	=> $post,
 				'type'	=> 'checkbox'
 			);
-			$fields['post_type_'. $post .'_amount'] = array(
-				'label'	=> sprintf( __( 'Amount of %s to generate', 'wppf' ), $label ),
-				'meta'	=> 'post_type_'. $post .'_amount',
+			$fields[$post .'_amount'] = array(
+				'label'	=> sprintf( __( 'Amount of %s to generate', 'wppf' ), $value['label'] ),
+				'meta'	=> $post .'_amount',
 				'type'	=> 'number',
 				'default'	=> get_option( 'posts_per_page' )
 			);
@@ -70,9 +64,9 @@ class Dashboard_Setting_Fields extends Setting_Fields
 		);
 
 		// API fields
-		$fields['paragraphs'] = array(
+		$fields['api_paragraphs'] = array(
 			'label'		=> __( 'The number of paragraphs to generate.', 'wppf' ),
-			'meta'		=> 'paragraphs',
+			'meta'		=> 'api_paragraphs',
 			'type'		=> 'number',
 			'default'	=> '5'
 		);
@@ -84,9 +78,9 @@ class Dashboard_Setting_Fields extends Setting_Fields
 			'verylong'	=> __( 'Very long', 'wppf' )
 		);
 
-		$fields['paragraphs_length'] = array(
+		$fields['api_paragraphs_length'] = array(
 			'label'	=> __( 'The average length of a paragraph.', 'wppf' ),
-			'meta'	=> 'paragraphs_length',
+			'meta'	=> 'api_paragraphs_length',
 			'type'	=> 'select',
 			'multiple'	=> $paragraphs_length
 		);
@@ -110,11 +104,11 @@ class Dashboard_Setting_Fields extends Setting_Fields
 			);
 		endforeach;
 
-		$fields['_wppfnonce'] = array(
-			'label'	=> '_wppfnonce',
-			'meta'	=> '_wppfnonce',
+		$fields[ $this->nonce ] = array(
+			'label'	=> $this->nonce,
+			'meta'	=> $this->nonce,
 			'type'	=> 'nonce',
-			'value'	=> wp_create_nonce( '_wppfnonce' )
+			'value'	=> wp_create_nonce( $this->nonce )
 		);
 
 		/**
