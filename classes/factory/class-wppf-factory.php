@@ -26,14 +26,24 @@ class Factory
 	private $nonce;
 
 	/**
+	 * Thumbnail extension
+	 * @access private
+	 * @var string
+	 *
+	 * @since 1.0.0
+	 */
+	private $thumbnail_extension;
+
+	/**
 	 * Construct
 	 *
 	 * @since 1.0.0
 	 */
 	function __construct()
 	{
-		$dashboard = new Dashboard;
-		$this->nonce = $dashboard->nonce;
+		$dashboard 					= new Dashboard;
+		$this->nonce 				= $dashboard->nonce;
+		$this->thumbnail_extension 	= 'jpg';
 
 		add_action( 'admin_init', array( $this, 'create' ) );
 	}
@@ -55,7 +65,7 @@ class Factory
 			if ( ! array_key_exists( $key, $_POST ) )
 				continue;
 
-			$placeholders = array(
+			$content_placeholders = array(
 				'api_paragraphs' 		=> ( isset( $_POST['api_paragraphs'] ) ) ? $_POST['api_paragraphs'] : null,
 				'api_paragraphs_length'	=> ( isset( $_POST['api_paragraphs_length'] ) ) ? $_POST['api_paragraphs_length'] : null,
 				'api_decorate' 			=> ( isset( $_POST['api_decorate'] ) ) ? 'decorate' : null,
@@ -72,34 +82,94 @@ class Factory
 			$post_type	= $value['type'];
 
 			for ( $i = 0; $i < $amount; $i++ ) :
-				$text = $this->text( $placeholders );
-				preg_match( '`<h1>(.*?)</h1>`im', $text, $title );
-				$lipsum_post = get_default_post_to_edit( $post_type, true );
+				$content = $this->content( $content_placeholders );
+				preg_match( '`<h1>(.*?)</h1>`im', $content, $title );
+				$new_post = get_default_post_to_edit( $post_type, true );
 				$args = array(
-					'ID'			=> $lipsum_post->ID,
+					'ID'			=> $new_post->ID,
 					'post_title'	=> $title[1],
-					'post_content'	=> str_replace( $title[0], '', $text ),
+					'post_content'	=> str_replace( $title[0], '', $content ),
 					'post_status'	=> 'publish',
 					'post_type'		=> $post_type
 				);
 
 				wp_update_post( $args );
+
+				// Add featured post thumbnail if current post type supports it
+				if ( post_type_supports( $post_type, 'thumbnail' ) ) :
+					$this->set_thumbnail( $new_post->ID );
+				endif;
 			endfor;
 		endforeach;
 	}
 
 	/**
-	 * Get the text
-	 * @param array $placeholders 	Array of placeholders
+	 * Set the post thumbnail
+	 * @param int $post_id 		ID of parent post
+	 *
+	 * @since 1.0.0
+	 */
+	private function set_thumbnail( $post_id )
+	{
+		$thumbnail_placeholders = array(
+			get_option( 'large_size_w' ),
+			get_option( 'large_size_h' )
+		);
+		$image = 'thumbnail-'. time() .'-'. $post_id .'.'. $this->thumbnail_extension;
+		$upload 	= wp_upload_dir();
+		$filename	= $upload['path'] . '/'. $image;
+		$this->thumbnail( $thumbnail_placeholders, $filename );
+
+		// Attach the new generated image to the current post
+		$args = array(
+			'post_title'		=> $image,
+			'post_status'		=> 'inherit',
+			'post_content'		=> '',
+			'guid'				=> $upload['url'] .'/'. $image,
+			'post_mime_type'	=> 'image/'. $this->thumbnail_extension
+		);
+		$attachment_id = wp_insert_attachment( $args, $filename, $post_id );
+
+		// Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
+		require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+		// Generate the metadata for the attachment, and update the database record.
+		$attachment_data = wp_generate_attachment_metadata( $attachment_id, $filename );
+		wp_update_attachment_metadata( $attachment_id, $attachment_data );
+
+		// Set the post thumbnail
+		update_post_meta( $post_id, '_thumbnail_id', $attachment_id );
+	}
+
+	/**
+	 * Get the content
+	 * @param array $placeholders 	Array of Placeholder
 	 * @link https://loripsum.net/
 	 *
 	 * @since 1.0.0
 	 */
-	private function text( $placeholders )
+	private function content( $placeholders )
 	{
-			$request	= join( '/', $placeholders );
-			$text 		= new Content;
+			$request = join( '/', $placeholders );
+			$content = new Content;
 
-			return $text->api( $request );
+			return $content->api( $request );
+	}
+
+	/**
+	 * Get the thumbnail
+	 * @param array $placeholders 	Array of Placeholder
+	 * @link https://picsum.photos/
+	 * @param string $image 		path/to/file.extension
+	 *
+	 * @since 1.0.0
+	 */
+	private function thumbnail( $placeholders, $filename )
+	{
+			$request 	= join( '/', $placeholders );
+			$request 	= $request .'.'. $this->thumbnail_extension;
+			$thumbnail	= new Thumbnail;
+
+			return $thumbnail->api( $request, $filename );
 	}
 }

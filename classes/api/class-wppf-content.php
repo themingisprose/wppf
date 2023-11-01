@@ -2,7 +2,7 @@
 namespace WPPF\API;
 
 /**
- * Loripsum API
+ * Content. Loripsum API
  * @link https://loripsum.net/
  *
  * @since 1.0.0
