@@ -21,9 +21,8 @@ class HTML
 	 * 							If $args['type'] is equal to 'select' or 'input'
 	 * 							Default 'text'
 	 * 							$args['multiple']: Array used to define the values of field type
-	 * 							'radio', 'select' or 'range'.
-	 * 							For field type 'range' $args['multiple'] should be like
-	 * 							array( 'min' => '0', 'max' => '100', 'step' => '0' )
+	 * 							'radio' or 'select'.
+	 * 							$args['attr']: Array of attributes
 	 *
 	 * @param string $value Default value
 	 *
@@ -36,7 +35,7 @@ class HTML
 		);
 		$args = wp_parse_args( $args, $defaults );
 
-		echo '<div class="wppf-field field-'. $args['type'] .'">';
+		echo '<div class="wppf-field field-'. $args['type'] .'" style="margin-bottom: .5rem">';
 			static::title( $args );
 			static::paragraph( $args );
 			static::default( $args, $value );
@@ -109,9 +108,6 @@ class HTML
 			return;
 
 		$default = $value ?? ( ( isset( $args['default'] ) ) ? $args['default'] : null );
-		$min	= ( 'range' == $args['type'] && isset( $args['multiple']['min'] ) ) ? 'min="'. $args['multiple']['min'] .'"' : null;
-		$max	= ( 'range' == $args['type'] && isset( $args['multiple']['max'] ) ) ? 'max="'. $args['multiple']['max'] .'"' : null;
-		$step	= ( 'range' == $args['type'] && isset( $args['multiple']['step'] ) ) ? 'step="'. $args['multiple']['step'] .'"' : null;
 		$value 	= ( 'button' != $args['type'] ) ? $default : $args['label'];
 		$class 	= ( 'button' != $args['type'] ) ? 'regular-text' : 'button';
 	?>
@@ -122,9 +118,13 @@ class HTML
 			type="<?php echo $args['type'] ?>"
 			name="<?php echo $args['meta'] ?>"
 			value="<?php echo $value ?>"
-			<?php echo $min ?>
-			<?php echo $max ?>
-			<?php echo $step ?>
+			<?php
+			if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
+				foreach ( $args['attr'] as $k => $value ) :
+					echo $k .'="'. $value .'" ';
+				endforeach;
+			endif;
+			?>
 		>
 	<?php
 	}
@@ -142,7 +142,22 @@ class HTML
 			return;
 	?>
 		<p><label for="<?php echo $args['meta'] ?>" class="description"><?php echo $args['label'] ?></label></p>
-		<textarea id="<?php echo $args['meta'] ?>" class="regular-text mb-3" name="<?php echo $args['meta'] ?>" cols="30" rows="5"><?php echo $value ?></textarea>
+		<textarea
+			id="<?php echo $args['meta'] ?>"
+			class="regular-text mb-3"
+			name="<?php echo $args['meta'] ?>"
+			cols="30"
+			rows="5"
+			<?php
+			if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
+				foreach ( $args['attr'] as $k => $value ) :
+					echo $k .'="'. $value .'" ';
+				endforeach;
+			endif;
+			?>
+		>
+			<?php echo $value ?>
+		</textarea>
 	<?php
 	}
 
@@ -159,7 +174,19 @@ class HTML
 			return;
 		?>
 			<label>
-				<input type="checkbox" name="<?php echo $args['meta'] ?>" value="1" <?php checked( $value, 1 ) ?>>
+				<input
+					type="checkbox"
+					name="<?php echo $args['meta'] ?>"
+					value="1"
+					<?php checked( $value, 1 ) ?>
+					<?php
+					if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
+						foreach ( $args['attr'] as $k => $value ) :
+							echo $k .'="'. $value .'" ';
+						endforeach;
+					endif;
+					?>
+				>
 				<?php echo $args['label'] ?>
 			</label>
 		<?php
@@ -180,10 +207,22 @@ class HTML
 		if ( is_array( $args['multiple'] ) ) :
 			foreach ( $args['multiple'] as $k => $v ) :
 		?>
-		<p><label>
-			<input type="radio" name="<?php echo $args['meta'] ?>" value="<?php echo $k ?>" <?php checked( $k, $value ) ?>>
+		<label>
+			<input
+				type="radio"
+				name="<?php echo $args['meta'] ?>"
+				value="<?php echo $k ?>"
+				<?php checked( $k, $value ) ?>
+				<?php
+				if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
+					foreach ( $args['attr'] as $k => $value ) :
+						echo $k .'="'. $value .'" ';
+					endforeach;
+				endif;
+				?>
+			>
 			<?php echo $v ?>
-		</label></p>
+		</label>
 		<?php
 			endforeach;
 		endif;
@@ -204,7 +243,17 @@ class HTML
 		$option = ( ! is_array( $args['multiple'] ) ) ? __( 'No data available', 'wppf' ) : __( 'Select an option', 'wppf' );
 	?>
 		<p><label for="<?php echo $args['meta'] ?>" class="description"><?php echo $args['label'] ?></label></p>
-		<select id="<?php echo $args['meta'] ?>" name="<?php echo $args['meta'] ?>">
+		<select
+			id="<?php echo $args['meta'] ?>"
+			name="<?php echo $args['meta'] ?>"
+			<?php
+			if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
+				foreach ( $args['attr'] as $k => $v ) :
+					echo $k .'="'. $v .'" ';
+				endforeach;
+			endif;
+			?>
+		>
 			<option value=""><?php echo $option ?></option>
 			<?php
 			if ( is_array( $args['multiple'] ) ) :
@@ -234,7 +283,7 @@ class HTML
 			id="<?php echo $args['meta'] ?>"
 			type="hidden"
 			name="<?php echo $args['meta'] ?>"
-			value="<?php echo $args['value'] ?>"
+			value="<?php echo $args['default'] ?>"
 		>
 	<?php
 	}

@@ -21,7 +21,7 @@ class Dashboard_Setting_Fields extends Setting_Fields
 		$this->option_name 		= 'wppf_options';
 		$this->section_id 		= 'wppf-setting-fields-section';
 		$this->field_id 		= 'wppf-setting-fields-field';
-		$this->field_title 		= __( 'Factory Setting', 'text-domain' );
+		$this->field_title 		= __( 'Factory Setting', 'wppf' );
 		$this->wpml_field		= 'my_class_of_fields_filters_fields';
 
 		$this->nonce 			= '_wppfnonce';
@@ -31,13 +31,13 @@ class Dashboard_Setting_Fields extends Setting_Fields
 	{
 
 		$fields['title_01'] = array(
-			'label'	=> __( 'Post Type Setting', 'text-domain' ),
+			'label'	=> __( 'Post Type Setting', 'wppf' ),
 			'meta'	=> null,
 			'type'	=> 'title'
 		);
 
 		$fields['paragraph_01'] = array(
-			'label'	=> __( 'Select the post type and the amount of each one to generate', 'text-domain' ),
+			'label'	=> __( 'Select the post type and the amount of each one to generate', 'wppf' ),
 			'meta'	=> null,
 			'type'	=> 'paragraph'
 		);
@@ -50,15 +50,19 @@ class Dashboard_Setting_Fields extends Setting_Fields
 				'type'	=> 'checkbox'
 			);
 			$fields[$post .'_amount'] = array(
-				'label'	=> sprintf( __( 'Amount of %s to generate', 'wppf' ), $value['label'] ),
+				'label'	=> sprintf( __( 'Amount of <strong>%s</strong> to generate', 'wppf' ), $value['label'] ),
 				'meta'	=> $post .'_amount',
 				'type'	=> 'number',
-				'default'	=> get_option( 'posts_per_page' )
+				'default'	=> get_option( 'posts_per_page' ),
+				'attr'	=> array(
+					'min'	=> 1,
+					'max'	=> get_option( 'posts_per_page' )
+				)
 			);
 		endforeach;
 
 		$fields['title_02'] = array(
-			'label'	=> __( 'API Setting', 'text-domain' ),
+			'label'	=> __( 'API Setting', 'wppf' ),
 			'meta'	=> null,
 			'type'	=> 'title'
 		);
@@ -68,7 +72,10 @@ class Dashboard_Setting_Fields extends Setting_Fields
 			'label'		=> __( 'The number of paragraphs to generate.', 'wppf' ),
 			'meta'		=> 'api_paragraphs',
 			'type'		=> 'number',
-			'default'	=> '5'
+			'default'	=> '5',
+			'attr'	=> array(
+				'min'	=> 1
+			)
 		);
 
 		$paragraphs_length = array(
@@ -108,7 +115,23 @@ class Dashboard_Setting_Fields extends Setting_Fields
 			'label'	=> $this->nonce,
 			'meta'	=> $this->nonce,
 			'type'	=> 'nonce',
-			'value'	=> wp_create_nonce( $this->nonce )
+			'default'	=> wp_create_nonce( $this->nonce )
+		);
+
+		$fields['title_03'] = array(
+			'label'	=> __( 'Note:', 'wppf' ),
+			'meta'	=> null,
+			'type'	=> 'title'
+		);
+
+		$fields['paragraph_02'] = array(
+			'label'	=> sprintf(
+						__( 'For performance reasons the maximums of post per request is the value of <a href="%s"><code>posts_per_page</code></a> option, in your case is <code>%s</code>.', 'wppf' ),
+						admin_url( 'options-reading.php#posts_per_page' ),
+						get_option( 'posts_per_page' )
+					),
+			'meta'	=> null,
+			'type'	=> 'paragraph'
 		);
 
 		/**
