@@ -3,5 +3,4 @@
  * Loaded classes
  */
 new WPPF\Admin\Dashboard;
-new WPPF\Setting_Fields\Dashboard_Setting_Fields;
 new WPPF\Factory\Factory;

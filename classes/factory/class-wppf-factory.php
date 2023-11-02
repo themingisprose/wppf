@@ -53,7 +53,7 @@ class Factory
 	 *
 	 * @since 1.0.0
 	 */
-	function create()
+	public function create()
 	{
 		if ( ! isset( $_POST[ $this->nonce ] )
 			|| ! wp_verify_nonce( $_POST[ $this->nonce ], $this->nonce ) )
@@ -83,24 +83,33 @@ class Factory
 
 			for ( $i = 0; $i < $amount; $i++ ) :
 				$content = $this->content( $content_placeholders );
-				preg_match( '`<h1>(.*?)</h1>`im', $content, $title );
-				$new_post = get_default_post_to_edit( $post_type, true );
-				$args = array(
-					'ID'			=> $new_post->ID,
-					'post_title'	=> $title[1],
-					'post_content'	=> str_replace( $title[0], '', $content ),
-					'post_status'	=> 'publish',
-					'post_type'		=> $post_type
-				);
-
-				wp_update_post( $args );
-
-				// Add featured post thumbnail if current post type supports it
-				if ( post_type_supports( $post_type, 'thumbnail' ) ) :
-					$this->set_thumbnail( $new_post->ID );
-				endif;
+				$new_post = $this->set_post( $content, $post_type );
+				$this->set_thumbnail( $new_post );
 			endfor;
 		endforeach;
+	}
+
+	/**
+	 * Set post
+	 * @param string $content	The post content
+	 * @param string $post_type Post Type
+	 * @return int 				Post ID
+	 *
+	 * @since 1.0.1
+	 */
+	private function set_post( $content, $post_type )
+	{
+		preg_match( '`<h1>(.*?)</h1>`im', $content, $title );
+		$new_post = get_default_post_to_edit( $post_type, true );
+		$args = array(
+			'ID'			=> $new_post->ID,
+			'post_title'	=> $title[1],
+			'post_content'	=> str_replace( $title[0], '', $content ),
+			'post_status'	=> 'publish',
+			'post_type'		=> $post_type
+		);
+
+		return wp_update_post( $args );
 	}
 
 	/**
@@ -111,6 +120,10 @@ class Factory
 	 */
 	private function set_thumbnail( $post_id )
 	{
+		$post_type = get_post_type( $post_id );
+		if ( ! post_type_supports( $post_type, 'thumbnail' ) )
+			return;
+
 		$thumbnail_placeholders = array(
 			get_option( 'large_size_w' ),
 			get_option( 'large_size_h' )

@@ -5,7 +5,7 @@
  * Plugin URI: https://github.com/themingisprose/wppf
  * Author: RogerTM
  * Author URI: https://rogertm.com
- * Version: 1.0.0
+ * Version: 1.0.1
  * License: GPL2
  * Text Domain: wppf
  * Domain Path: /languages
