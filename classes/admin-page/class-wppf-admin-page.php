@@ -124,7 +124,7 @@ abstract class Admin_Page
 					<?php
 						settings_fields( $this->option_group );
 						do_settings_sections( $this->menu_slug );
-						submit_button();
+						submit_button( __( 'Start!', 'wppf' ) );
 					?>
 				</form>
 			</div>

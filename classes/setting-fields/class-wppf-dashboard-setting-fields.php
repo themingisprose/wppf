@@ -126,7 +126,7 @@ class Dashboard_Setting_Fields extends Setting_Fields
 
 		$fields['paragraph_02'] = array(
 			'label'	=> sprintf(
-						__( 'For performance reasons the maximums of post per request is the value of <a href="%s"><code>posts_per_page</code></a> option, in your case is <code>%s</code>.', 'wppf' ),
+						__( '<em>For performance reasons the maximums of post per request is the value of <a href="%s"><code>posts_per_page</code></a> option, in your case is <code>%s</code>.</em>', 'wppf' ),
 						admin_url( 'options-reading.php#posts_per_page' ),
 						get_option( 'posts_per_page' )
 					),

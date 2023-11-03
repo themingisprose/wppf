@@ -26,7 +26,7 @@ class Posts
 		);
 		$get_post_types = get_post_types( $args, 'objects' );
 		foreach ( $get_post_types as $post => $value ) :
-			// No attachment support
+			// No attachment support... so far.
 			if ( 'attachment' == $post )
 				continue;
 			$post_types[ 'post_type_'. $post ] = array(

@@ -50,6 +50,7 @@ class Factory
 
 	/**
 	 * Create posts
+	 * @return void
 	 *
 	 * @since 1.0.0
 	 */
@@ -115,6 +116,7 @@ class Factory
 	/**
 	 * Set the post thumbnail
 	 * @param int $post_id 		ID of parent post
+	 * @return void
 	 *
 	 * @since 1.0.0
 	 */
@@ -158,6 +160,7 @@ class Factory
 	 * Get the content
 	 * @param array $placeholders 	Array of Placeholder
 	 * @link https://loripsum.net/
+	 * @return string 				Lorem ipsum dolor sit amet...
 	 *
 	 * @since 1.0.0
 	 */
@@ -172,8 +175,9 @@ class Factory
 	/**
 	 * Get the thumbnail
 	 * @param array $placeholders 	Array of Placeholder
-	 * @link https://picsum.photos/
 	 * @param string $image 		path/to/file.extension
+	 * @link https://picsum.photos/
+	 * @return void
 	 *
 	 * @since 1.0.0
 	 */

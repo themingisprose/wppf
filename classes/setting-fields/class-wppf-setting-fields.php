@@ -90,7 +90,7 @@ abstract class Setting_Fields
 	 *
 	 * @since 1.0.0
 	 */
-	function register_setting()
+	public function register_setting()
 	{
 		register_setting(
 			$this->option_group,
@@ -120,7 +120,7 @@ abstract class Setting_Fields
 	 *
 	 * @since 1.0.0
 	 */
-	function get_option( $meta )
+	private function get_option( $meta )
 	{
 		$option = get_option( $this->option_name );
 
@@ -135,7 +135,7 @@ abstract class Setting_Fields
 	 *
 	 * @since 1.0.0
 	 */
-	function sanitize_options()
+	public function sanitize_options()
 	{
 		/**
 		 * Filters the Options Input
@@ -152,7 +152,7 @@ abstract class Setting_Fields
 	 *
 	 * @since 1.0.0
 	 */
-	function callback()
+	private function callback()
 	{
 		return array( $this, 'render' );
 	}
@@ -162,7 +162,7 @@ abstract class Setting_Fields
 	 *
 	 * @since 1.0.0
 	 */
-	function render()
+	public function render()
 	{
 		$fields = $this->fields();
 
@@ -177,7 +177,7 @@ abstract class Setting_Fields
 	 *
 	 * @since 1.0.0
 	 */
-	function validate()
+	private function validate()
 	{
 		$fields = $this->fields();
 
@@ -187,7 +187,7 @@ abstract class Setting_Fields
 										: null;
 		endforeach;
 
-		add_settings_error( 'wppf-update', 'wppf', __( 'Setting Updated', 'wppf' ), 'success' );
+		add_settings_error( 'wppf-update', 'wppf', __( 'Done!', 'wppf' ), 'success' );
 
 		return $input;
 	}

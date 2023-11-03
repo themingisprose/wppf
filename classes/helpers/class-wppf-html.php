@@ -31,7 +31,8 @@ class HTML
 	public static function field( $args, $value )
 	{
 		$defaults = array(
-			'type'	=> 'text'
+			'type'	=> 'text',
+			'attr'	=> null
 		);
 		$args = wp_parse_args( $args, $defaults );
 
@@ -118,13 +119,7 @@ class HTML
 			type="<?php echo $args['type'] ?>"
 			name="<?php echo $args['meta'] ?>"
 			value="<?php echo $value ?>"
-			<?php
-			if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
-				foreach ( $args['attr'] as $k => $value ) :
-					echo $k .'="'. $value .'" ';
-				endforeach;
-			endif;
-			?>
+			<?php static::attr( $args['attr'] ) ?>
 		>
 	<?php
 	}
@@ -148,13 +143,7 @@ class HTML
 			name="<?php echo $args['meta'] ?>"
 			cols="30"
 			rows="5"
-			<?php
-			if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
-				foreach ( $args['attr'] as $k => $value ) :
-					echo $k .'="'. $value .'" ';
-				endforeach;
-			endif;
-			?>
+			<?php static::attr( $args['attr'] ) ?>
 		>
 			<?php echo $value ?>
 		</textarea>
@@ -179,13 +168,7 @@ class HTML
 					name="<?php echo $args['meta'] ?>"
 					value="1"
 					<?php checked( $value, 1 ) ?>
-					<?php
-					if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
-						foreach ( $args['attr'] as $k => $value ) :
-							echo $k .'="'. $value .'" ';
-						endforeach;
-					endif;
-					?>
+					<?php static::attr( $args['attr'] ) ?>
 				>
 				<?php echo $args['label'] ?>
 			</label>
@@ -213,13 +196,7 @@ class HTML
 				name="<?php echo $args['meta'] ?>"
 				value="<?php echo $k ?>"
 				<?php checked( $k, $value ) ?>
-				<?php
-				if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
-					foreach ( $args['attr'] as $k => $value ) :
-						echo $k .'="'. $value .'" ';
-					endforeach;
-				endif;
-				?>
+				<?php static::attr( $args['attr'] ) ?>
 			>
 			<?php echo $v ?>
 		</label>
@@ -240,19 +217,15 @@ class HTML
 		if ( 'select' != $args['type'] )
 			return;
 
-		$option = ( ! is_array( $args['multiple'] ) ) ? __( 'No data available', 'wppf' ) : __( 'Select an option', 'wppf' );
+		$option = ( ! is_array( $args['multiple'] ) )
+					? __( 'No data available', 'wppf' )
+					: __( '&mdash; Select an option &mdash;', 'wppf' );
 	?>
 		<p><label for="<?php echo $args['meta'] ?>" class="description"><?php echo $args['label'] ?></label></p>
 		<select
 			id="<?php echo $args['meta'] ?>"
 			name="<?php echo $args['meta'] ?>"
-			<?php
-			if ( isset( $args['attr'] ) && is_array( $args['attr'] ) ) :
-				foreach ( $args['attr'] as $k => $v ) :
-					echo $k .'="'. $v .'" ';
-				endforeach;
-			endif;
-			?>
+			<?php static::attr( $args['attr'] ) ?>
 		>
 			<option value=""><?php echo $option ?></option>
 			<?php
@@ -286,5 +259,22 @@ class HTML
 			value="<?php echo $args['default'] ?>"
 		>
 	<?php
+	}
+
+	/**
+	 * Process the $args['attr'] var
+	 * @param array $attr
+	 * @return string
+	 *
+	 * @since 1.0.1
+	 */
+	private static function attr( $attr )
+	{
+		if ( ! is_array( $attr ) )
+			return;
+
+		foreach ( $attr as $k => $v ) :
+			echo $k .'="'. $v .'" ';
+		endforeach;
 	}
 }

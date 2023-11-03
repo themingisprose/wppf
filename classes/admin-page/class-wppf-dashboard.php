@@ -21,6 +21,6 @@ class Dashboard extends Admin_Page
 		$this->menu_slug	= 'wppf-setting';
 		$this->option_group	= 'wppf_setting';
 		$this->option_name 	= 'wppf_options';
-		$this->icon_url 	= 'dashicons-admin-post';
+		$this->icon_url 	= 'dashicons-admin-generic';
 	}
 }
